@@ -84,7 +84,9 @@ else
 fi
 
 # Installation de Docker et Docker-Compose
+curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master/install_docker_docker-compose.sh -o install_docker_docker-compose.sh
 bash install_docker_docker-compose.sh
 
 #Installation d'e-comBox
+curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsLinux/master/configure_application.sh -o configure_application.sh
 bash configure_application.sh
