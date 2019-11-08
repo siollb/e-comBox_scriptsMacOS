@@ -47,12 +47,12 @@ echo -e "Récupération des paramètres du proxy s'ils existent"
 
 IS_PROXY_ENABLED = networksetup -getwebproxy Ethernet | grep ^Enabled: | awk {'print $2'}
 SERVICE = "Ethernet"
-if [IS_PROXY_ENABLED == ""]; then
+if ["$IS_PROXY_ENABLED" == ""]; then
     IS_PROXY_ENABLED = networksetup -getwebproxy Wi-Fi | grep ^Enabled: | awk {'print $2'}
     SERVICE = "Wi-Fi"
 fi
 
-if [IS_PROXY_ENABLED == "Yes"]; then
+if ["$IS_PROXY_ENABLED" == "Yes"]; then
     ADRESSE_PROXY = networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1
 fi 
 
