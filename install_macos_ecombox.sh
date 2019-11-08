@@ -102,5 +102,5 @@ curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master
 bash install_docker_docker-compose.sh
 
 #Installation d'e-comBox
-curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsLinux/master/configure_application.sh -o configure_application.sh
+curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master/configure_application.sh -o configure_application.sh
 bash configure_application.sh
