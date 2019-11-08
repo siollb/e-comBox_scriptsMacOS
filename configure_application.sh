@@ -59,9 +59,9 @@ touch ~/Applications/e-comBox/log/ecombox.log
 echo -e "$COLPARTIE"
 echo -e "Configuration de l'adresse IP"
 
-ADRESSE_IP_PRIVE = ipconfig getifaddr en0
-if [ADRESSE_IP_PRIVE == ""]; then
-        ADRESSE_IP_PRIVE = ipconfig getifaddr en1
+ADRESSE_IP_PRIVE=ipconfig getifaddr en0
+if [ ADRESSE_IP_PRIVE == "" ]; then
+        ADRESSE_IP_PRIVE=`ipconfig getifaddr en1`
 fi
 
 #Gestion des adresses IP
