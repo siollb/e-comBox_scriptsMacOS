@@ -51,28 +51,27 @@ echo "*                DE SON ENVIRONNEMENT             *"
 echo "***************************************************"
 
 echo -e "$COLINFO"
-echo -e "Création d'un fichier de log : /var/log/ecombox.log"
+echo -e "Création d'un fichier de log : ~/Applications/e-comBox/log/ecombox.log"
 echo -e "$COLCMD"
-sudo touch /var/log/ecombox.log
+touch ~/Applications/e-comBox/log/ecombox.log
 
 
 echo -e "$COLPARTIE"
 echo -e "Configuration de l'adresse IP"
 
-#Gestion des adresses IP
-echo -e "$COLTXT"
-echo -e "Saisissez l'adresse IP privée du serveur: $COLSAISIE\c"
-read ADRESSE_IP_PRIVE
+ADRESSE_IP_PRIVE = ipconfig getifaddr en0
+if [ADRESSE_IP_PRIVE == ""]; then
+        ADRESSE_IP_PRIVE = ipconfig getifaddr en1
+fi
 
-echo -e "$COLTXT"
-echo -e "Si le serveur doit être accessible de l'extérieur, saisissez l'adresse IP publique ou un nom de domaine pleinement qualifié. C'est cette adresse IP ou ce nom de domaine qui apparaîtra au niveau de chaque site créé. $COLSAISIE\c"
-echo -e "(Laisser vide et validez si le serveur ne sera pas accessible de l'extérieur. L'application e-comBox utilisera l'adresse IP privée) :" 
-read ADRESSE_IP_PUBLIQUE
+#Gestion des adresses IP
+#echo -e "$COLTXT"
+#echo -e "Saisissez l'adresse IP privée du serveur: $COLSAISIE\c"
+#read ADRESSE_IP_PRIVE
 
 echo -e "$COLINFO"
 echo -e "Vous vous apprêtez à utiliser les paramètres suivants:"
 echo -e "IP privé :	$ADRESSE_IP_PRIVE"
-echo -e "IP publique :	$ADRESSE_IP_PUBLIQUE"
 echo -e "$COLCMD"
 
 POURSUIVRE
@@ -140,25 +139,25 @@ echo -e "$COLPARTIE"
 echo -e "Récupération et configuration de Portainer"
 echo -e "$COLCMD"
 
-if [ ! -d "/opt/e-comBox" ]; then
-	mkdir -p ~/opt/e-comBox
+if [ ! -d "~/Applications/e-comBox" ]; then
+	mkdir -p ~/Applications/e-comBox
 fi
 
-if [ -d "/opt/e-comBox/e-comBox_portainer" ]; then
+if [ -d "~/Applications/e-comBox/e-comBox_portainer" ]; then
 	echo -e "$COLDEFAUT"
 	echo "Portainer existe et va être remplacé"
 	echo -e "$COLCMD\c"
-        cd ~/opt/e-comBox/e-comBox_portainer
+        cd ~/Applications/e-comBox/e-comBox_portainer
 	docker-compose down
-	rm -rf ~/opt/e-comBox/e-comBox_portainer
+	rm -rf ~/Applications/e-comBox/e-comBox_portainer
 fi
 
-cd ~/opt/e-comBox
+cd ~/Applications/e-comBox
 git clone https://github.com/siollb/e-comBox_portainer.git
 
 #Configuration de l'adresse IP
 echo -e "$COLDEFAUT"
-echo "Mise à jour de /opt/e-comBox/e-comBox_portainer/.env"
+echo "Mise à jour de ~/Applications/e-comBox/e-comBox_portainer/.env"
 echo -e "$COLCMD"
 
 if [ "$ADRESSE_IP_PUBLIQUE" != "" ] ; then
@@ -167,7 +166,7 @@ if [ "$ADRESSE_IP_PUBLIQUE" != "" ] ; then
 fi
 
 echo -e "$COLCMD\c"
-echo "URL_UTILE=$URL_UTILE" > ~/opt/e-comBox/e-comBox_portainer/.env
+echo "URL_UTILE=$URL_UTILE" > ~/Applications/e-comBox/e-comBox_portainer/.env
 echo ""
 
 
@@ -176,7 +175,7 @@ echo ""
 echo -e "$COLDEFAUT"
 echo "Lancement de portainer"
 echo -e "$COLCMD\c"
-cd ~/opt/e-comBox/e-comBox_portainer/
+cd ~/Applications/e-comBox/e-comBox_portainer/
 docker-compose up --build -d
 
 echo -e "$COLINFO"
@@ -219,19 +218,12 @@ echo "Suppression éventuelle des images si elle ne sont associées à aucun sit
 echo -e "$COLCMD\c"
 echo -e ""
 
-sudo docker image rm -f $(docker images -q) 2>> /var/log/errorEcomBox.log
+docker image rm -f $(docker images -q) 2>> ~/Applications/e-comBox/log/errorEcomBox.log
 
 if [ `docker images -qf dangling=true` ]; then
- sudo docker rmi $(docker images -qf dangling=true) 2>> /var/log/errorEcomBox.log
+        docker rmi $(docker images -qf dangling=true) 2>> ~/Applications/e-comBox/log/errorEcomBox.log
 fi
 
-# Configuration de l'API 
-#screen -dt ~/Library/Containers/com.docker.docker/Data/vms/0/tty
-
-#for fichier in /var/lib/docker/volumes/ecombox_data/_data/*.js /var/lib/docker/volumes/ecombox_data/_data/*.js.map
-#do
-#        sed -i -e "s/localhost:8880/$URL_UTILE:8880/g" $fichier
-#done
 
 echo -e "$COLTITRE"
 echo "***************************************************"
@@ -243,31 +235,21 @@ echo "Téléchargement du fichier contenant les identifiants d'accès et des scr
 echo -e "$COLCMD\c"
 
 # Téléchargement du fichier contenant les identifiants d'accès
-#if [ "$ADRESSE_PROXY" != "" ]; then
-#   wget --proxy $ADRESSE_PROXY https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf -O /opt/e-comBox/e-comBox_identifiants_acces_applications.pdf
-#   wget --proxy $ADRESSE_PROXY https://github.com/siollb/e-comBox_scriptsLinux/raw/master/change_config_ip.sh -O /opt/e-comBox/change_config_ip.sh
-#   wget --proxy $ADRESSE_PROXY https://github.com/siollb/e-comBox_scriptsLinux/raw/master/configure_application.sh -O /opt/e-comBox/configure_application.sh
-#    else
-#       curl https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf -O /opt/e-comBox/e-comBox_identifiants_acces_applications.pdf
-#       curl https://github.com/siollb/e-comBox_scriptsLinux/raw/master/change_config_ip.sh -O /opt/e-comBox/change_config_ip.sh
-#       curl https://github.com/siollb/e-comBox_scriptsLinux/raw/master/configure_application.sh -O /opt/e-comBox/configure_application.sh
-#fi
+curl -o ~/Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/e-comBox_identifiants_acces_applications.pdf
+curl -o ~/Applications/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/configure_application.sh
 
-curl -o ~/opt/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf
-curl -o ~/opt/e-comBox/change_config_ip.sh https://github.com/siollb/e-comBox_scriptsLinux/raw/master/change_config_ip.sh
-curl -o ~/opt/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsLinux/raw/master/configure_application.sh
+echo -e "$COLINFO"
+echo "Suppression des différents éléments nécessaires à l'installation"
+
+sed -i '' -e '$ d' ~/.bash_profile
+unset ALL_PROXY
+git config --global --unset https.proxy
+git config --global --unset http.proxy
 
 
 echo -e "$COLINFO"
 echo "L'application e-comBox est maintenant accessible à l'URL suivante :"
 echo -e "http://$URL_UTILE:8888"
 echo -e ""
-echo -e "Les identifiants d'accès figurent dans le fichier /opt/e-comBox/e-comBox_identifiants_acces_applications.pdf"
+echo -e "Les identifiants d'accès figurent dans le fichier ~/Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf"
 echo -e "$COLCMD"
-
-
-
-
-
-
-
