@@ -51,16 +51,21 @@ echo "*                DE SON ENVIRONNEMENT             *"
 echo "***************************************************"
 
 echo -e "$COLINFO"
-echo -e "Création d'un fichier de log : ~/Applications/e-comBox/log/ecombox.log"
+echo -e "Création d'un fichier de log : /Applications/e-comBox/log/ecombox.log"
 echo -e "$COLCMD"
-touch ~/Applications/e-comBox/log/ecombox.log
+
+if [ ! -d "/Applications/e-comBox" ]; then
+	mkdir -p /Applications/e-comBox/log
+fi
+
+touch /Applications/e-comBox/log/ecombox.log
 
 
 echo -e "$COLPARTIE"
 echo -e "Configuration de l'adresse IP"
 
-ADRESSE_IP_PRIVE=ipconfig getifaddr en0
-if [ ADRESSE_IP_PRIVE == "" ]; then
+ADRESSE_IP_PRIVE=`ipconfig getifaddr en0`
+if [ "$ADRESSE_IP_PRIVE" == "" ]; then
         ADRESSE_IP_PRIVE=`ipconfig getifaddr en1`
 fi
 
@@ -139,25 +144,25 @@ echo -e "$COLPARTIE"
 echo -e "Récupération et configuration de Portainer"
 echo -e "$COLCMD"
 
-if [ ! -d "~/Applications/e-comBox" ]; then
-	mkdir -p ~/Applications/e-comBox
+if [ ! -d "/Applications/e-comBox" ]; then
+	mkdir -p /Applications/e-comBox
 fi
 
-if [ -d "~/Applications/e-comBox/e-comBox_portainer" ]; then
+if [ -d "/Applications/e-comBox/e-comBox_portainer" ]; then
 	echo -e "$COLDEFAUT"
 	echo "Portainer existe et va être remplacé"
 	echo -e "$COLCMD\c"
-        cd ~/Applications/e-comBox/e-comBox_portainer
+        cd /Applications/e-comBox/e-comBox_portainer
 	docker-compose down
-	rm -rf ~/Applications/e-comBox/e-comBox_portainer
+	rm -rf /Applications/e-comBox/e-comBox_portainer
 fi
 
-cd ~/Applications/e-comBox
+cd /Applications/e-comBox
 git clone https://github.com/siollb/e-comBox_portainer.git
 
 #Configuration de l'adresse IP
 echo -e "$COLDEFAUT"
-echo "Mise à jour de ~/Applications/e-comBox/e-comBox_portainer/.env"
+echo "Mise à jour de /Applications/e-comBox/e-comBox_portainer/.env"
 echo -e "$COLCMD"
 
 if [ "$ADRESSE_IP_PUBLIQUE" != "" ] ; then
@@ -166,7 +171,7 @@ if [ "$ADRESSE_IP_PUBLIQUE" != "" ] ; then
 fi
 
 echo -e "$COLCMD\c"
-echo "URL_UTILE=$URL_UTILE" > ~/Applications/e-comBox/e-comBox_portainer/.env
+echo "URL_UTILE=$URL_UTILE" > /Applications/e-comBox/e-comBox_portainer/.env
 echo ""
 
 
@@ -175,7 +180,7 @@ echo ""
 echo -e "$COLDEFAUT"
 echo "Lancement de portainer"
 echo -e "$COLCMD\c"
-cd ~/Applications/e-comBox/e-comBox_portainer/
+cd /Applications/e-comBox/e-comBox_portainer/
 docker-compose up --build -d
 
 echo -e "$COLINFO"
@@ -218,10 +223,10 @@ echo "Suppression éventuelle des images si elle ne sont associées à aucun sit
 echo -e "$COLCMD\c"
 echo -e ""
 
-docker image rm -f $(docker images -q) 2>> ~/Applications/e-comBox/log/errorEcomBox.log
+docker image rm -f $(docker images -q) 2>> /Applications/e-comBox/log/errorEcomBox.log
 
 if [ `docker images -qf dangling=true` ]; then
-        docker rmi $(docker images -qf dangling=true) 2>> ~/Applications/e-comBox/log/errorEcomBox.log
+        docker rmi $(docker images -qf dangling=true) 2>> /Applications/e-comBox/log/errorEcomBox.log
 fi
 
 
@@ -235,8 +240,8 @@ echo "Téléchargement du fichier contenant les identifiants d'accès et des scr
 echo -e "$COLCMD\c"
 
 # Téléchargement du fichier contenant les identifiants d'accès
-curl -o ~/Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/e-comBox_identifiants_acces_applications.pdf
-curl -o ~/Applications/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/configure_application.sh
+curl -o /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf
+curl -o /Applications/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/configure_application.sh
 
 echo -e "$COLINFO"
 echo "Suppression des différents éléments nécessaires à l'installation"
@@ -251,5 +256,5 @@ echo -e "$COLINFO"
 echo "L'application e-comBox est maintenant accessible à l'URL suivante :"
 echo -e "http://$URL_UTILE:8888"
 echo -e ""
-echo -e "Les identifiants d'accès figurent dans le fichier ~/Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf"
+echo -e "Les identifiants d'accès figurent dans le fichier /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf"
 echo -e "$COLCMD"
