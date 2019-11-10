@@ -29,7 +29,7 @@ POURSUIVRE()
         REPONSE=""
         while [ "$REPONSE" != "o" -a "$REPONSE" != "O" -a "$REPONSE" != "n" ]
         do
-          echo -e "$COLTXT"
+          echo -e "$COLDEFAUT"
 	  echo -e "Peut-on poursuivre (o par défaut) ? (${COLCHOIX}o/n${COLTXT}) $COLSAISIE\c"
 	  read REPONSE
           if [ -z "$REPONSE" ]; then
@@ -57,14 +57,13 @@ if [ "$IS_PROXY_ENABLED" == "Yes" ]; then
     ADRESSE_PROXY=`networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1`
 fi 
 
-#echo -e "$COLTXT"
-#echo -e "Si vous disposez d'un proxy, veuillez saisir son adresse : $COLSAISIE\c"
-#echo -e "(Laisser vide et validez si pas de proxy sinon saisir ip-proxy:port) :"
-#read ADRESSE_PROXY
-
 echo -e "$COLINFO"
-echo -e "Vous vous apprêtez à utiliser les paramètres proxy suivants :"
-echo -e "Proxy :	$ADRESSE_PROXY"
+if [ "$ADRESSE_PROXY" != "" ]; then
+    echo -e "Vous vous apprêtez à utiliser les paramètres proxy suivants :"
+    echo -e "Proxy :	$ADRESSE_PROXY"
+else 
+    echo -e "Aucun proxy configuré"
+fi
 echo -e "$COLCMD"
 
 POURSUIVRE

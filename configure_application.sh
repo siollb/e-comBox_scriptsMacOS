@@ -31,7 +31,7 @@ POURSUIVRE()
         REPONSE=""
         while [ "$REPONSE" != "o" -a "$REPONSE" != "O" -a "$REPONSE" != "n" ]
         do
-          echo -e "$COLTXT"
+          echo -e "$COLPARTIE"
 	  echo -e "Peut-on poursuivre (o par défaut) ? (${COLCHOIX}o/n${COLTXT}) $COLSAISIE\c"
 	  read REPONSE
           if [ -z "$REPONSE" ]; then
@@ -240,8 +240,8 @@ echo "Téléchargement du fichier contenant les identifiants d'accès et des scr
 echo -e "$COLCMD\c"
 
 # Téléchargement du fichier contenant les identifiants d'accès
-curl -o /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf
-curl -o /Applications/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/configure_application.sh
+curl -LJo /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf
+curl -LJo /Applications/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/configure_application.sh
 
 echo -e "$COLINFO"
 echo "Suppression des différents éléments nécessaires à l'installation"
@@ -254,7 +254,7 @@ git config --global --unset http.proxy
 
 echo -e "$COLINFO"
 echo "L'application e-comBox est maintenant accessible à l'URL suivante :"
-echo -e "http://$URL_UTILE:8888"
+echo -e "http://localhost:8888"
 echo -e ""
 echo -e "Les identifiants d'accès figurent dans le fichier /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf"
 echo -e "$COLCMD"
