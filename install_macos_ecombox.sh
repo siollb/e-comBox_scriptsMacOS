@@ -45,15 +45,16 @@ POURSUIVRE()
 echo -e "$COLTXT"
 echo -e "Récupération des paramètres du proxy s'ils existent"
 
-IS_PROXY_ENABLED = networksetup -getwebproxy Ethernet | grep ^Enabled: | awk {'print $2'}
-SERVICE = "Ethernet"
-if [IS_PROXY_ENABLED == ""]; then
-    IS_PROXY_ENABLED = networksetup -getwebproxy Wi-Fi | grep ^Enabled: | awk {'print $2'}
-    SERVICE = "Wi-Fi"
+IS_PROXY_ENABLED=`networksetup -getwebproxy Ethernet | grep ^Enabled: | awk {"print $2"}`
+SERVICE="Ethernet"
+
+if [ "$IS_PROXY_ENABLED" == "" ]; then
+    IS_PROXY_ENABLED=`networksetup -getwebproxy Wi-Fi | grep ^Enabled: | awk {'print $2'}`
+    SERVICE="Wi-Fi"
 fi
 
-if [IS_PROXY_ENABLED == "Yes"]; then
-    ADRESSE_PROXY = networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1
+if [ "$IS_PROXY_ENABLED" == "Yes" ]; then
+    ADRESSE_PROXY=`networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1`
 fi 
 
 #echo -e "$COLTXT"
@@ -102,5 +103,5 @@ curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master
 bash install_docker_docker-compose.sh
 
 #Installation d'e-comBox
-curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsLinux/master/configure_application.sh -o configure_application.sh
+curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOSmaster/configure_application.sh -o configure_application.sh
 bash configure_application.sh
