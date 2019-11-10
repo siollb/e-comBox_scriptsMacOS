@@ -246,7 +246,7 @@ curl -LJo /Applications/e-comBox/configure_application.sh https://github.com/sio
 echo -e "$COLINFO"
 echo "Suppression des différents éléments nécessaires à l'installation"
 
-sed -i '' -e '$ d' ~/.bash_profile
+sed -i '' -e "$ d" ~/.bash_profile
 unset ALL_PROXY
 git config --global --unset https.proxy
 git config --global --unset http.proxy
