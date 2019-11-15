@@ -58,7 +58,7 @@ if [ "$IS_PROXY_ENABLED" == "Enabled: Yes" ]; then
 fi 
 
 echo -e "$COLINFO"
-if [ "$ADRESSE_PROXY" != "" ]; then
+if [ "$ADRESSE_PROXY" != "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
     echo -e "Vous vous apprêtez à utiliser les paramètres proxy suivants :"
     echo -e "Proxy :	$ADRESSE_PROXY"
 else 
