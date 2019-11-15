@@ -50,6 +50,32 @@ echo "*     INSTALLATION DE E-COMBOX ET CONFIGURATION   *"
 echo "*                DE SON ENVIRONNEMENT             *"
 echo "***************************************************"
 
+if [ -z $1 ]; then
+        IS_PROXY_ENABLED=`networksetup -getwebproxy Ethernet | grep ^Enabled:`
+        SERVICE="Ethernet"
+
+        if [ "$IS_PROXY_ENABLED" == "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
+                IS_PROXY_ENABLED=`networksetup -getwebproxy Wi-Fi | grep ^Enabled:`
+                SERVICE="Wi-Fi"
+        fi
+
+        if [ "$IS_PROXY_ENABLED" == "Enabled: Yes" ]; then
+                ADRESSE_PROXY=`networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1`
+        fi
+
+        if [ "$ADRESSE_PROXY" != "" ]; then
+                echo -e "$COLDEFAUT"
+                echo -e "Congiguration de GIT pour le proxy"
+                sleep 2
+                echo -e "$COLCMD\c"
+                git config --global http.proxy http://$ADRESSE_PROXY
+                git config --global https.proxy https://$ADRESSE_PROXY
+
+                echo -e "export ALL_PROXY=$ADRESSE_PROXY" >> ~/.bash_profile
+                export ALL_PROXY=$ADRESSE_PROXY
+        fi
+fi
+
 echo -e "$COLINFO"
 echo -e "Création d'un fichier de log : /Applications/e-comBox/log/ecombox.log"
 echo -e "$COLCMD"

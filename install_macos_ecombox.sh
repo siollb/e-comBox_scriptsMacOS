@@ -48,7 +48,7 @@ echo -e "Récupération des paramètres du proxy s'ils existent"
 IS_PROXY_ENABLED=`networksetup -getwebproxy Ethernet | grep ^Enabled:`
 SERVICE="Ethernet"
 
-if [ "$IS_PROXY_ENABLED" == "" ]; then
+if [ "$IS_PROXY_ENABLED" == "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
     IS_PROXY_ENABLED=`networksetup -getwebproxy Wi-Fi | grep ^Enabled:`
     SERVICE="Wi-Fi"
 fi
@@ -103,4 +103,4 @@ bash install_docker_docker-compose.sh
 
 #Installation d'e-comBox
 curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master/configure_application.sh -o configure_application.sh
-bash configure_application.sh
+bash configure_application.sh $ADRESSE_PROXY
