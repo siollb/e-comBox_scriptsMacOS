@@ -48,7 +48,7 @@ echo -e "Récupération des paramètres du proxy s'ils existent"
 IS_PROXY_ENABLED=`networksetup -getwebproxy Ethernet | grep ^Enabled:`
 SERVICE="Ethernet"
 
-if [ "$IS_PROXY_ENABLED" == "" ]; then
+if [ "$IS_PROXY_ENABLED" == "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
     IS_PROXY_ENABLED=`networksetup -getwebproxy Wi-Fi | grep ^Enabled:`
     SERVICE="Wi-Fi"
 fi
@@ -58,7 +58,7 @@ if [ "$IS_PROXY_ENABLED" == "Enabled: Yes" ]; then
 fi 
 
 echo -e "$COLINFO"
-if [ "$ADRESSE_PROXY" != "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
+if [ "$ADRESSE_PROXY" != "" ]; then
     echo -e "Vous vous apprêtez à utiliser les paramètres proxy suivants :"
     echo -e "Proxy :	$ADRESSE_PROXY"
 else 
