@@ -73,7 +73,12 @@ if [ -z $1 ]; then
 
                 echo -e "export ALL_PROXY=$ADRESSE_PROXY" >> ~/.bash_profile
                 export ALL_PROXY=$ADRESSE_PROXY
-        fi
+        else 
+		sed -i '' -e "$ d" ~/.bash_profile
+		unset ALL_PROXY
+		git config --global --unset https.proxy
+		git config --global --unset http.proxy		
+	fi
 fi
 
 echo -e "$COLINFO"
@@ -193,14 +198,13 @@ echo -e "$COLCMD"
 
 if [ "$ADRESSE_IP_PUBLIQUE" != "" ] ; then
 	URL_UTILE=$ADRESSE_IP_PUBLIQUE
-	else URL_UTILE=$ADRESSE_IP_PRIVE
+else 
+	URL_UTILE=$ADRESSE_IP_PRIVE
 fi
 
 echo -e "$COLCMD\c"
 echo "URL_UTILE=$URL_UTILE" > /Applications/e-comBox/e-comBox_portainer/.env
 echo ""
-
-
 
 # Lancement de Portainer
 echo -e "$COLDEFAUT"
@@ -255,6 +259,15 @@ if [ `docker images -qf dangling=true` ]; then
         docker rmi $(docker images -qf dangling=true) 2>> /Applications/e-comBox/log/errorEcomBox.log
 fi
 
+# Arrêt des containers
+echo -e "$COLDEFAUT"
+echo "Arrêt des containers Prestashop, WooCommerce et WordPress"
+
+LIST_CONTAINERS=`docker ps -q -f name=prestashop && docker ps -q -f name=woocommerce && docker ps -q -f name=blog`
+
+if [ -n "$LIST_CONTAINERS" ]; then
+	docker stop $LIST_CONTAINERS
+fi
 
 echo -e "$COLTITRE"
 echo "***************************************************"
