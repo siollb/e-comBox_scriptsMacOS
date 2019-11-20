@@ -263,11 +263,13 @@ fi
 echo -e "$COLDEFAUT"
 echo "Arrêt des containers Prestashop, WooCommerce et WordPress"
 
-LIST_CONTAINERS=`docker ps -q -f name=prestashop && docker ps -q -f name=woocommerce && docker ps -q -f name=blog`
+LIST_CONTAINERS=`docker ps -q -f name=prestashop- && docker ps -q -f name=woocommerce- && docker ps -q -f name=blog-`
 
 if [ -n "$LIST_CONTAINERS" ]; then
 	docker stop $LIST_CONTAINERS
 fi
+
+LIST_TO_DELETE=`docker ps -q -a -f name=sftp_`
 
 echo -e "$COLTITRE"
 echo "***************************************************"
