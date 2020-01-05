@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Installation de Portainer
-# Les fichiers incluant le docker-compose seront téléchargés dans /opt/e-comBox
+# Les fichiers incluant le docker-compose seront téléchargés dans /Applications/e-comBox
 
 # Couleurs
 COLTITRE="\033[1;35m"   # Rose
 COLPARTIE="\033[1;34m"  # Bleu
-COLTXT="\033[0;37m"     # Gris
+COLTXT="\033[0;90m"     # Gris
 COLCHOIX="\033[1;33m"   # Jaune
 COLDEFAUT="\033[0;33m"  # Brun-jaune
 COLSAISIE="\033[1;32m"  # Vert
-COLCMD="\033[1;37m"     # Blanc
+COLCMD="\033[0;39m"     # Default
 COLERREUR="\033[1;31m"  # Rouge
 COLINFO="\033[0;36m"    # Cyan
 
@@ -24,7 +24,14 @@ ERREUR()
         exit 1
 }
 
-
+STOPPER()
+{
+        echo -e "$COLSTOP"
+        echo -e "Vous avez décidé de ne pas continuer à installer et configurer e-comBox. Vous pouvez reprendre la procédure quand vous voulez."
+	echo -e "$1"
+        echo -e "$COLTXT"
+        exit 1
+}
 
 POURSUIVRE()
 {
@@ -43,43 +50,88 @@ POURSUIVRE()
 	fi
 }
 
+INIT()
+{
+	#Création du dossier d'installation de l'application s'il n'existe pas déjà
+	if [ ! -d "/Applications/e-comBox" ]; then
+		mkdir /Applications/e-comBox
+	fi
+
+	if [ -z $1 ]; then
+        	IS_PROXY_ENABLED=`networksetup -getwebproxy Ethernet | grep ^Enabled:`
+        	SERVICE="Ethernet"
+
+        	if [ "$IS_PROXY_ENABLED" == "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
+                	IS_PROXY_ENABLED=`networksetup -getwebproxy Wi-Fi | grep ^Enabled:`
+                	SERVICE="Wi-Fi"
+        	fi
+
+        	if [ "$IS_PROXY_ENABLED" == "Enabled: Yes" ]; then
+                	ADRESSE_PROXY=`networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1`
+        	fi
+
+        	if [ "$ADRESSE_PROXY" != "" ]; then
+                	echo -e "$COLDEFAUT"
+                	echo -e "Congiguration de GIT pour le proxy"
+                	sleep 2
+                	echo -e "$COLCMD\c"
+                	git config --global http.proxy http://$ADRESSE_PROXY
+                	git config --global https.proxy https://$ADRESSE_PROXY
+
+                	echo -e "export ALL_PROXY=$ADRESSE_PROXY" >> ~/.bash_profile
+                	export ALL_PROXY=$ADRESSE_PROXY
+        	else
+                	sed -i '' -e "$ d" ~/.bash_profile
+                	unset ALL_PROXY
+                	git config --global --unset https.proxy
+                	git config --global --unset http.proxy
+        	fi
+	fi
+
+	# Téléchargement de la licence CeCILL
+	curl -LJo /Applications/e-comBox/licenceCeCILL.txt https://gitlab.com/e-combox/e-comBox_scriptsLinux/raw/master/licenceCeCILL.txt
+	
+	echo -e ""
+	echo -e "$COLINFO"
+	echo -e "Vous devez maintenant lire et accepter les termes de la licence CeCILL avant d'installer et de pouvoir utiliser e-comBox."
+	echo -e "$COLCMD"
+	echo -e "Appuyer sur n'importe quelle touche pour lire la licence CeCILL."
+	echo -e ""
+
+	if [ ! -e /Applications/e-comBox/licenceCeCILL.txt ]; then
+   		echo -e "$COLINFO"
+   		echo -e "Le fichier contenant les termes de la licence n'a pas pu être téléchargé et rangé dans le répertoire /Applications/e-comBox."
+   		echo -e "Éventuellement, téléchargez le fichier par vos propres moyens via l'URL suivante https://gitlab.com/e-combox/e-comBox_scriptsLinux/raw/master/licenceCeCILL.txt et rangez-le dans le dossier /opt/e-comBox."
+   		echo -e ""
+   		echo -e "Relancez-ensuite le script : bash /Applications/e-comBox/configure_application.sh"
+   		echo -e ""
+   		echo -e "Appuyer sur n'importe quelle touche pour arrêter le script."
+   		read entree
+   	else
+     		read contenu
+     		more /Applications/e-comBox/licenceCeCILL.txt
+     		echo -e "Acceptez-vous les termes de la licence CeCCILL (o par défaut) ? (${COLCHOIX}o/n${COLTXT}) $COLSAISIE\c"
+     		echo -e ""
+     		read saisie
+		if [ -z "$saisie" ]; then
+            		 saisie="o"
+          	fi
+     		if [ "$saisie" = o ]; then
+        		INSTALL
+        	else 
+			STOPPER
+     		fi
+	fi
+}
+
+INSTALL()
+{
 #clear
 echo -e "$COLTITRE"
 echo "***************************************************"
 echo "*     INSTALLATION DE E-COMBOX ET CONFIGURATION   *"
 echo "*                DE SON ENVIRONNEMENT             *"
 echo "***************************************************"
-
-if [ -z $1 ]; then
-        IS_PROXY_ENABLED=`networksetup -getwebproxy Ethernet | grep ^Enabled:`
-        SERVICE="Ethernet"
-
-        if [ "$IS_PROXY_ENABLED" == "" ] || [ "$IS_PROXY_ENABLED" == "Enabled: No" ]; then
-                IS_PROXY_ENABLED=`networksetup -getwebproxy Wi-Fi | grep ^Enabled:`
-                SERVICE="Wi-Fi"
-        fi
-
-        if [ "$IS_PROXY_ENABLED" == "Enabled: Yes" ]; then
-                ADRESSE_PROXY=`networksetup -getwebproxy $SERVICE | awk {'print $2'} | awk {'getline l2; getline l3; print l2":"l3'} | head -n 1`
-        fi
-
-        if [ "$ADRESSE_PROXY" != "" ]; then
-                echo -e "$COLDEFAUT"
-                echo -e "Congiguration de GIT pour le proxy"
-                sleep 2
-                echo -e "$COLCMD\c"
-                git config --global http.proxy http://$ADRESSE_PROXY
-                git config --global https.proxy https://$ADRESSE_PROXY
-
-                echo -e "export ALL_PROXY=$ADRESSE_PROXY" >> ~/.bash_profile
-                export ALL_PROXY=$ADRESSE_PROXY
-        else 
-		sed -i '' -e "$ d" ~/.bash_profile
-		unset ALL_PROXY
-		git config --global --unset https.proxy
-		git config --global --unset http.proxy		
-	fi
-fi
 
 echo -e "$COLINFO"
 echo -e "Création d'un fichier de log : /Applications/e-comBox/log/ecombox.log"
@@ -281,8 +333,9 @@ echo "Téléchargement du fichier contenant les identifiants d'accès et des scr
 echo -e "$COLCMD\c"
 
 # Téléchargement du fichier contenant les identifiants d'accès
-curl -LJo /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://github.com/siollb/e-comBox_scriptsLinux/raw/master/e-comBox_identifiants_acces_applications.pdf
-curl -LJo /Applications/e-comBox/configure_application.sh https://github.com/siollb/e-comBox_scriptsMacOS/raw/master/configure_application.sh
+curl -LJo /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf https://gitlab.com/e-combox/e-comBox_scriptsLinux/blob/master/e-comBox_identifiants_acces_applications.pdf
+curl -LJo /Applications/e-comBox/configure_application.sh https://gitlab.com/e-combox/e-comBox_scriptsMacOS/raw/master/configure_application.sh
+curl -LJo /Applications/e-comBox/configure_application.sh https://gitlab.com/e-combox/e-comBox_scriptsMacOS/raw/master/install_macos_ecombox.sh
 
 echo -e "$COLINFO"
 echo "Suppression des différents éléments nécessaires à l'installation"
@@ -299,3 +352,7 @@ echo -e "http://localhost:8888"
 echo -e ""
 echo -e "Les identifiants d'accès figurent dans le fichier /Applications/e-comBox/e-comBox_identifiants_acces_applications.pdf"
 echo -e "$COLCMD"
+}
+
+INIT
+exit 0

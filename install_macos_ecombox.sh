@@ -98,9 +98,9 @@ else
 fi
 
 # Installation de Docker et Docker-Compose
-curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master/install_docker_docker-compose.sh -o install_docker_docker-compose.sh
+curl -fsSL https://gitlab.com/e-combox/e-comBox_scriptsMacOS/blob/master/install_docker_docker-compose.sh -o install_docker_docker-compose.sh
 bash install_docker_docker-compose.sh
 
 #Installation d'e-comBox
-curl -fsSL https://raw.githubusercontent.com/siollb/e-comBox_scriptsMacOS/master/configure_application.sh -o configure_application.sh
+curl -fsSL https://gitlab.com/e-combox/e-comBox_scriptsMacOS/raw/master/configure_application.sh -o configure_application.sh
 bash configure_application.sh $ADRESSE_PROXY
